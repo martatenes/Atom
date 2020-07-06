@@ -3,6 +3,7 @@ package com.fractalmedia.codechallenge.atom.adapters;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fractalmedia.codechallenge.atom.R;
@@ -17,6 +19,8 @@ import com.fractalmedia.codechallenge.atom.constants.Constants;
 import com.fractalmedia.codechallenge.atom.models.Movie;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder>  {
@@ -26,6 +30,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
 
     public MovieAdapter(Context context){
         this.context = context;
+        mMovieList = new ArrayList<>();
     }
 
     @NonNull
@@ -55,7 +60,24 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
     }
 
     public void setData(List<Movie> movieList) {
-        this.mMovieList = movieList;
+        this.mMovieList.addAll(movieList);
+        notifyDataSetChanged();
+    }
+
+    public void clearAll() {
+        mMovieList.clear();
+        notifyDataSetChanged();
+    }
+
+    public void filterItems(String query) {
+        List<Movie> filterList = new ArrayList<Movie>();
+        for(Movie movie : mMovieList){
+            if (movie.getTitle().toLowerCase().contains(query.toLowerCase())){
+                filterList.add(movie);
+            }
+        }
+        clearAll();
+        setData(filterList);
     }
 
     public static class MyViewHolder  extends RecyclerView.ViewHolder{

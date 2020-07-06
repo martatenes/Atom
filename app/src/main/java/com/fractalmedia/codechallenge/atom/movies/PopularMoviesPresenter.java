@@ -21,8 +21,11 @@ public class PopularMoviesPresenter implements PopularMoviesContract.Presenter, 
     }
 
 
+   
+
+
     @Override
-    public void getMoreMovies(int numPage) {
+    public void requestMovies(int numPage) {
 
         if (movieListView != null) {
             movieListView.showProgress();
@@ -31,18 +34,10 @@ public class PopularMoviesPresenter implements PopularMoviesContract.Presenter, 
     }
 
     @Override
-    public void requestMovies() {
-
-        if (movieListView != null) {
-            movieListView.showProgress();
-        }
-        movieListModel.getMoviesList(this, 1);
-    }
-
-    @Override
-    public void onSuccess(List<Movie> movieArrayList) {
+    public void onSuccess(List<Movie> movieArrayList, int currentPage, int totalPages) {
         if (movieListView != null) {
             movieListView.hideProgress();
+            movieListView.setPaginationData(currentPage, totalPages);
             movieListView.setData(movieArrayList);
         }
     }

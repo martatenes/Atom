@@ -18,6 +18,8 @@ import static com.fractalmedia.codechallenge.atom.constants.Constants.API_KEY;
 public class PopularMoviesModel implements PopularMoviesContract.Model {
     private final String TAG = "MoviesListModel";
 
+
+
     @Override
     public void getMoviesList(OnFinishedListener onFinishedListener, int numPage) {
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
@@ -25,9 +27,11 @@ public class PopularMoviesModel implements PopularMoviesContract.Model {
         call.enqueue(new Callback<MovieListResponse>() {
             @Override
             public void onResponse(Call<MovieListResponse> call, Response<MovieListResponse> response) {
-                List<Movie> movies = response.body().getResults();
+                List<Movie> movies = response.body().getMovies();
+                int currentPage = response.body().getPage();
+                int totalPages = response.body().getTotalPages();
                 Log.d(TAG, "Number of movies received: " + movies.size());
-                onFinishedListener.onSuccess(movies);
+                onFinishedListener.onSuccess(movies, currentPage, totalPages);
             }
 
             @Override

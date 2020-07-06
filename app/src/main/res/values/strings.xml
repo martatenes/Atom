@@ -3,4 +3,6 @@
     <string name="TR_OCURRIO_ERROR_CONFIGURACION">Ocurrió un error al obtener la configuración. Por favor, inténtelo de nuevo</string>
     <string name="TR_LAS_MAS_POPULARES">Las más populares</string>
     <string name="TR_PELICULAS_POPULARES">Las más populares</string>
+    <string name="search_title">Buscar película</string>
+    <string name="search_hint">Busca una película</string>
 </resources>
