@@ -7,12 +7,14 @@ import java.util.List;
 public class PopularMoviesContract {
 
     public interface Model{
+
         interface OnFinishedListener{
             void onSuccess (List<Movie> movieList, int currentPage, int totalPages);
             void onFailure(Throwable t);
         }
 
         void getMoviesList(OnFinishedListener onFinishedListener, int numPage);
+        void getMoviesListByQuery(OnFinishedListener onFinishedListener, int numPage, String query);
     }
 
     public interface View{
@@ -33,5 +35,6 @@ public class PopularMoviesContract {
     public interface Presenter{
         void onDestroy();
         void requestMovies(int numPage); // Pedimos más datos al api rest
+
     }
 }

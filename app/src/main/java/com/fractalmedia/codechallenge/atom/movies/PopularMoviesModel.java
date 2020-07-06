@@ -7,6 +7,7 @@ import com.fractalmedia.codechallenge.atom.repositories.ApiClient;
 import com.fractalmedia.codechallenge.atom.repositories.ApiInterface;
 import com.fractalmedia.codechallenge.atom.repositories.responses.MovieListResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -27,11 +28,34 @@ public class PopularMoviesModel implements PopularMoviesContract.Model {
         call.enqueue(new Callback<MovieListResponse>() {
             @Override
             public void onResponse(Call<MovieListResponse> call, Response<MovieListResponse> response) {
-                List<Movie> movies = response.body().getMovies();
+                List<Movie> movies = response.body().getMovies() != null ? response.body().getMovies() : new ArrayList<>();
                 int currentPage = response.body().getPage();
                 int totalPages = response.body().getTotalPages();
-                Log.d(TAG, "Number of movies received: " + movies.size());
                 onFinishedListener.onSuccess(movies, currentPage, totalPages);
+            }
+
+            @Override
+            public void onFailure(Call<MovieListResponse> call, Throwable t) {
+                // Log error here since request failed
+                Log.e(TAG, t.toString());
+                onFinishedListener.onFailure(t);
+            }
+        });
+    }
+
+    @Override
+    public void getMoviesListByQuery(OnFinishedListener onFinishedListener, int numPage, String query) {
+        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
+        Call<MovieListResponse> call = apiService.getMoviesBySearch(API_KEY, numPage, query);
+        call.enqueue(new Callback<MovieListResponse>() {
+            @Override
+            public void onResponse(Call<MovieListResponse> call, Response<MovieListResponse> response) {
+                    List<Movie> movies = response.body().getMovies() != null ? response.body().getMovies() : new ArrayList<>();
+                    int currentPage = response.body().getPage();
+                    int totalPages = response.body().getTotalPages();
+                    Log.d(TAG, "Number of movies received: " + movies.size());
+                    onFinishedListener.onSuccess(movies, currentPage, totalPages);
+
             }
 
             @Override

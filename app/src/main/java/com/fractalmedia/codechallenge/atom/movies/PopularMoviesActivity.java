@@ -2,6 +2,7 @@ package com.fractalmedia.codechallenge.atom.movies;
 
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -36,19 +37,21 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
     private boolean isLastPage = false;
     private int totalPages = 1;
     private Boolean isLoading = false;
-
+    private Boolean isSearchActive = false;
+    private String searchQuery = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.popular_movies_activity);
         initUI();
+        setUpListeners();
         // Inicializamos presenter
         mPresenter = new PopularMoviesPresenter(this);
         mPresenter.requestMovies(1);
     }
 
-    private void initUI(){
+    private void initUI() {
         setToolBar();
         // Inicializamos recyclerView + adapter
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
@@ -58,39 +61,59 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
         recyclerView.setLayoutManager(layoutManager);
         mAdapter = new MovieAdapter(this);
         recyclerView.setAdapter(mAdapter);
+    }
 
+    private void setUpListeners() {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 mAdapter.clearAll(); // Nos cargamos todos los datos por si habíamos paginado
-                mAdapter.notifyDataSetChanged();
                 currentPage = 1;
-                mPresenter.requestMovies(currentPage);
-            }
-        });
-        recyclerView.addOnScrollListener(new PaginationScrollListener(layoutManager) {
-
-            @Override
-            protected void loadMoreItems() {
-
-                if (!isLastPage) {
-                    isLoading = true;
-                    currentPage += 1;
+                if (isSearchActive) {
+                    mPresenter.requestMoviesByQuery(currentPage, searchQuery);
+                } else {
                     mPresenter.requestMovies(currentPage);
                 }
             }
+        });
 
+
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            protected boolean isLastPage() {
-                return currentPage == totalPages;
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
             }
 
             @Override
-            protected boolean isLoading() {
-                return isLoading;
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+
+
+                int visibleItemCount = layoutManager.getChildCount();
+                int totalItemCount = layoutManager.getItemCount();
+                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+
+                if (!isLoading)
+                {
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0)
+                    {
+                        isLoading = true;
+                        currentPage+=1;
+                        if (currentPage < totalPages) { // Si no hemos llegado al final
+                            if (isSearchActive) {
+                                mPresenter.requestMoviesByQuery(currentPage, searchQuery);
+                            } else {
+                                mPresenter.requestMovies(currentPage);
+                            }
+                        }
+                    }
+                }
             }
         });
     }
+
 
     private void setToolBar() {
 
@@ -117,26 +140,35 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.popular_movies_menu, menu);
 
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
-
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnCloseListener(() -> {
+            mAdapter.clearAll();
+            currentPage = 1;
+            mPresenter.requestMovies(currentPage);
+            return false;
+        });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.d("A", "A buscar");
-                mAdapter.filterItems(query);
-                //TODO: Llamar al api rest Search Movies
+                searchQuery = query; // Nos guardamos la query para tenerla disponible en las funciones de paginación
+                isSearchActive = query != null && !query.isEmpty();
+                if (isSearchActive) {
+                    // Borramos los datos que hubiesen antes
+                    mAdapter.clearAll();
+                    mPresenter.requestMoviesByQuery(currentPage, query);
+                }
+                else{
+                    mPresenter.requestMovies(currentPage);
+                }
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 Log.d("Busqueda", newText);
+                searchQuery = newText;
                 return false;
             }
         });
@@ -151,17 +183,15 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
 
     @Override
     public void setData(List<Movie> movieList) {
-        mAdapter.setData(movieList);
-        mAdapter.notifyDataSetChanged();
-        isLoading = false;
+        mAdapter.addMovies(movieList);
         swipeRefreshLayout.setRefreshing(false);
+        isLoading = false;
 
     }
 
 
     @Override
     public void onResponseFailure(Throwable throwable) {
-        isLoading = false;
         swipeRefreshLayout.setRefreshing(false);
 
     }
@@ -181,29 +211,5 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
 
     }
 
-    public abstract static class PaginationScrollListener extends RecyclerView.OnScrollListener {
-        private GridLayoutManager layoutManager;
-        public PaginationScrollListener(GridLayoutManager layoutManager) {
-            this.layoutManager = layoutManager;
-        }
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-            int visibleItemCount = layoutManager.getChildCount();
-            int totalItemCount = layoutManager.getItemCount();
-            int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-            if (!isLoading() && !isLastPage()) {
-                if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-                        && firstVisibleItemPosition >= 0) {
-                    loadMoreItems();
-                }
-            }
-        }
 
-        protected abstract void loadMoreItems();
-
-        protected abstract boolean isLastPage();
-
-        protected abstract boolean isLoading();
-    }
 }
