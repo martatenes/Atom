@@ -7,12 +7,14 @@ import java.util.List;
 public class PopularMoviesContract {
 
     public interface Model{
+
         interface OnFinishedListener{
-            void onSuccess (List<Movie> movieList);
+            void onSuccess (List<Movie> movieList, int currentPage, int totalPages);
             void onFailure(Throwable t);
         }
 
         void getMoviesList(OnFinishedListener onFinishedListener, int numPage);
+        void getMoviesListByQuery(OnFinishedListener onFinishedListener, int numPage, String query);
     }
 
     public interface View{
@@ -21,17 +23,16 @@ public class PopularMoviesContract {
         void hideProgress();
 
         // Asignación de datos a RecyclerView
+        void setPaginationData(int currentPage, int totalPages);
         void setData(List<Movie> movieList);
         void onResponseFailure(Throwable throwable);
 
-        // Búsqueda
-        void clearResults();
-        void searchResults(String param);
+
     }
 
     public interface Presenter{
         void onDestroy();
-        void getMoreMovies(int numPage); // Paginación
-        void requestMovies(); // Pedimos más datos al api rest
+        void requestMovies(int numPage); // Pedimos más datos al api rest
+
     }
 }
