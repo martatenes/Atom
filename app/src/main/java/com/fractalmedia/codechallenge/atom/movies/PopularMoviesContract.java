@@ -27,9 +27,7 @@ public class PopularMoviesContract {
         void setData(List<Movie> movieList);
         void onResponseFailure(Throwable throwable);
 
-        // Búsqueda
-        void clearResults();
-        void searchResults(String param);
+
     }
 
     public interface Presenter{

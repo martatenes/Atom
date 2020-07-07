@@ -50,12 +50,15 @@ public class PopularMoviesModel implements PopularMoviesContract.Model {
         call.enqueue(new Callback<MovieListResponse>() {
             @Override
             public void onResponse(Call<MovieListResponse> call, Response<MovieListResponse> response) {
+                if (response.body() != null) {
                     List<Movie> movies = response.body().getMovies() != null ? response.body().getMovies() : new ArrayList<>();
                     int currentPage = response.body().getPage();
                     int totalPages = response.body().getTotalPages();
                     Log.d(TAG, "Number of movies received: " + movies.size());
                     onFinishedListener.onSuccess(movies, currentPage, totalPages);
-
+                }else{
+                    Log.e(TAG, response.errorBody().toString());
+                }
             }
 
             @Override

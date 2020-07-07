@@ -6,14 +6,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.widget.SearchView;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -24,13 +28,16 @@ import com.fractalmedia.codechallenge.atom.models.Movie;
 
 import java.util.List;
 
-public class PopularMoviesActivity extends AppCompatActivity implements PopularMoviesContract.View, SwipeRefreshLayout.OnRefreshListener {
+public class PopularMoviesActivity extends AppCompatActivity implements PopularMoviesContract.View {
     private PopularMoviesPresenter mPresenter;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
     private MovieAdapter mAdapter;
     private GridLayoutManager layoutManager;
+    private SearchView searchView;
+    private ProgressBar progressBar;
+    private TextView tvError;
 
     // Paginación
     private int currentPage = 1;
@@ -46,15 +53,33 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
         setContentView(R.layout.popular_movies_activity);
         initUI();
         setUpListeners();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         // Inicializamos presenter
         mPresenter = new PopularMoviesPresenter(this);
         mPresenter.requestMovies(1);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (!searchView.isIconified()){ // Cerramos el searchView si pulsamos el botón de atrás
+            searchView.onActionViewCollapsed();
+        }else{
+            super.onBackPressed();
+        }
+        isSearchActive = false;
+    }
+
     private void initUI() {
         setToolBar();
-        // Inicializamos recyclerView + adapter
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
+        progressBar = findViewById(R.id.progressBar);
+        tvError = findViewById(R.id.tvError);
+        tvError.setVisibility(View.GONE);
         recyclerView = findViewById(R.id.rvMovies);
         recyclerView.setHasFixedSize(true);
         layoutManager = new GridLayoutManager(this, 2);
@@ -63,22 +88,27 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
         recyclerView.setAdapter(mAdapter);
     }
 
+    private void setToolBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.TR_PELICULAS_POPULARES);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
+    }
+
     private void setUpListeners() {
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mAdapter.clearAll(); // Nos cargamos todos los datos por si habíamos paginado
-                currentPage = 1;
-                if (isSearchActive) {
-                    mPresenter.requestMoviesByQuery(currentPage, searchQuery);
-                } else {
-                    mPresenter.requestMovies(currentPage);
-                }
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            mAdapter.clearAll(); // Nos cargamos todos los datos por si habíamos paginado
+            tvError.setVisibility(View.GONE);
+            if (isSearchActive) {
+                mPresenter.requestMoviesByQuery(1, searchQuery);
+            } else {
+                mPresenter.requestMovies(1);
             }
         });
 
 
-
+        // Listener para la paginación
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -97,11 +127,12 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
 
                 if (!isLoading)
                 {
-                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0)
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) // Hemos llegado al final de la lista
                     {
-                        isLoading = true;
-                        currentPage+=1;
-                        if (currentPage < totalPages) { // Si no hemos llegado al final
+                        if (currentPage +1 <= totalPages) { // Si cambiamos de página y nos pasamos del total
+                            currentPage+=1;
+                            isLoading = true;
+                            tvError.setVisibility(View.GONE);
                             if (isSearchActive) {
                                 mPresenter.requestMoviesByQuery(currentPage, searchQuery);
                             } else {
@@ -114,24 +145,14 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
         });
     }
 
-
-    private void setToolBar() {
-
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(R.string.TR_PELICULAS_POPULARES);
-            actionBar.setDisplayShowHomeEnabled(true);
-        }
-    }
-
     @Override
     public void showProgress() {
-
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideProgress() {
-
+        progressBar.setVisibility(View.GONE);
     }
 
 
@@ -141,14 +162,18 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
         inflater.inflate(R.menu.popular_movies_menu, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setOnCloseListener(() -> {
-            mAdapter.clearAll();
-            currentPage = 1;
-            mPresenter.requestMovies(currentPage);
-            return false;
+        searchView.setOnCloseListener(() -> { // Al cerrar la búsqueda volvemos a obtener las películas
+            if (!searchView.isIconified()) {
+                searchView.onActionViewCollapsed();
+                isSearchActive = false;
+                mAdapter.clearAll();
+                mPresenter.requestMovies(1);
+            }
+            return true;
         });
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -157,7 +182,7 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
                 if (isSearchActive) {
                     // Borramos los datos que hubiesen antes
                     mAdapter.clearAll();
-                    mPresenter.requestMoviesByQuery(currentPage, query);
+                    mPresenter.requestMoviesByQuery(1, query);
                 }
                 else{
                     mPresenter.requestMovies(currentPage);
@@ -183,33 +208,30 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
 
     @Override
     public void setData(List<Movie> movieList) {
-        mAdapter.addMovies(movieList);
+        mAdapter.addMovies(movieList); // Las añadimos
         swipeRefreshLayout.setRefreshing(false);
         isLoading = false;
 
+        // Si teníamos la búsqueda activa y no hemos obtenido resultados mostramos un mensaje
+        if(isSearchActive && movieList.size() == 0){
+            tvError.setText(R.string.TR_NO_SE_HAN_ENCONTRADO_PELICULAS);
+            tvError.setVisibility(View.VISIBLE);
+        }
     }
 
-
+    // TODO: Aquí sería mejor gestionar la respuesta en base a los errorCode devueltos por el API. Por simplicidad mostraremos un mensaje genérico
     @Override
     public void onResponseFailure(Throwable throwable) {
         swipeRefreshLayout.setRefreshing(false);
-
+        isLoading = false;
+        showErrorAlert();
     }
 
-    @Override
-    public void clearResults() {
-
+    private void showErrorAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.TR_ERROR_COMUNICAR_SERVIDOR).setTitle(R.string.TR_ERROR);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
-
-    @Override
-    public void searchResults(String param) {
-
-    }
-
-    @Override
-    public void onRefresh() {
-
-    }
-
 
 }

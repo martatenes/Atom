@@ -3,6 +3,9 @@
     <string name="TR_OCURRIO_ERROR_CONFIGURACION">Ocurrió un error al obtener la configuración. Por favor, inténtelo de nuevo</string>
     <string name="TR_LAS_MAS_POPULARES">Las más populares</string>
     <string name="TR_PELICULAS_POPULARES">Las más populares</string>
-    <string name="search_title">Buscar película</string>
-    <string name="search_hint">Busca una película</string>
+    <string name="TR_BUSCAR">Buscar</string>
+    <string name="TR_BUSCAR_PELICULA">Busca una película</string>
+    <string name="TR_NO_SE_HAN_ENCONTRADO_PELICULAS">Vaya, parece que no hemos encontrado películas. Inténtalo de nuevo.</string>
+    <string name="TR_ERROR_COMUNICAR_SERVIDOR">Vaya, parece que ocurrió un error al comunicar con el servidor. Inténtelo de nuevo.</string>
+    <string name="TR_ERROR">Error</string>
 </resources>
