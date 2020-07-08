@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -24,7 +25,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.fractalmedia.codechallenge.atom.R;
 import com.fractalmedia.codechallenge.atom.adapters.MovieAdapter;
+import com.fractalmedia.codechallenge.atom.constants.Constants;
 import com.fractalmedia.codechallenge.atom.models.Movie;
+import com.fractalmedia.codechallenge.atom.movie_details.MovieDetailsActivity;
+import com.fractalmedia.codechallenge.atom.utils.Utils;
 
 import java.util.List;
 
@@ -84,8 +88,15 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
         recyclerView.setHasFixedSize(true);
         layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new MovieAdapter(this);
+        mAdapter = new MovieAdapter(this, this::OnClickMovie);
         recyclerView.setAdapter(mAdapter);
+    }
+
+    public void OnClickMovie(Movie movie){
+        Log.d("Movie", movie.getTitle());
+        Intent intent = new Intent(this, MovieDetailsActivity.class);
+        intent.putExtra(Constants.EXTRA_MOVIE, movie);
+        startActivity(intent);
     }
 
     private void setToolBar() {
@@ -156,7 +167,6 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
     }
 
 
-
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.popular_movies_menu, menu);
@@ -215,8 +225,8 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
         // Si teníamos la búsqueda activa y no hemos obtenido resultados mostramos un mensaje
         if(isSearchActive && movieList.size() == 0){
             tvError.setText(R.string.TR_NO_SE_HAN_ENCONTRADO_PELICULAS);
-            tvError.setVisibility(View.VISIBLE);
-        }
+            tvError.setVisibility(View.VISIBLE);        }
+
     }
 
     // TODO: Aquí sería mejor gestionar la respuesta en base a los errorCode devueltos por el API. Por simplicidad mostraremos un mensaje genérico
@@ -224,14 +234,14 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
     public void onResponseFailure(Throwable throwable) {
         swipeRefreshLayout.setRefreshing(false);
         isLoading = false;
-        showErrorAlert();
+        Utils.ShowSimpleAlert(this, getString(R.string.TR_ERROR),  getString(R.string.TR_OCURRIO_ERROR_CONFIGURACION), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("HOLA", "HOLA");
+            }
+        });
+        Utils.ShowSimpleAlert(this, getString(R.string.TR_ERROR),  getString(R.string.TR_OCURRIO_ERROR_CONFIGURACION));
     }
 
-    private void showErrorAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.TR_ERROR_COMUNICAR_SERVIDOR).setTitle(R.string.TR_ERROR);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
 
 }

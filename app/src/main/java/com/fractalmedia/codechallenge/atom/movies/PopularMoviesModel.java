@@ -19,8 +19,6 @@ import static com.fractalmedia.codechallenge.atom.constants.Constants.API_KEY;
 public class PopularMoviesModel implements PopularMoviesContract.Model {
     private final String TAG = "MoviesListModel";
 
-
-
     @Override
     public void getMoviesList(OnFinishedListener onFinishedListener, int numPage) {
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
@@ -36,7 +34,7 @@ public class PopularMoviesModel implements PopularMoviesContract.Model {
 
             @Override
             public void onFailure(Call<MovieListResponse> call, Throwable t) {
-                // Log error here since request failed
+                // TODO: Aquí sería mejor gestionar la respuesta en base a los errorCode devueltos por el API. Por simplicidad devolveremos el thrown
                 Log.e(TAG, t.toString());
                 onFinishedListener.onFailure(t);
             }

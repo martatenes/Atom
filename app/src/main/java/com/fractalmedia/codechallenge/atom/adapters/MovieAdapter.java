@@ -13,11 +13,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fractalmedia.codechallenge.atom.R;
 import com.fractalmedia.codechallenge.atom.constants.Constants;
 import com.fractalmedia.codechallenge.atom.models.Movie;
+import com.fractalmedia.codechallenge.atom.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -26,14 +28,18 @@ import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
 
+    public interface IMovieClickListener{
+        void onClick(Movie movie);
+    }
     public List<Movie> mMovieList;
     private Context context;
-
+    private IMovieClickListener mListener;
     private final int VIEW_TYPE_ITEM = 0;
     private final int VIEW_TYPE_LOADING = 1;
 
-    public MovieAdapter(Context context){
+    public MovieAdapter(Context context, IMovieClickListener listener){
         this.context = context;
+        this.mListener = listener;
         mMovieList = new ArrayList<>();
     }
 
@@ -62,12 +68,15 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             movieHolder.tvDesc.setText(mMovieList.get(position).getDescription());
 
             SharedPreferences sharedPreferences = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
-            String baseUrl = sharedPreferences.getString(Constants.CONFIGURATION_URL, null);
+            String baseUrl = Utils.getBaseUrlImages()
             String imagePath = mMovieList.get(position).getBackdropPath();
             if (baseUrl != null && imagePath != null) {
                 String url = baseUrl + "w780" + imagePath;
                 Picasso.get().load(url).placeholder(R.drawable.progress_animation).error(R.drawable.ic_movie_placeholder).into(movieHolder.ivMovie);
             }
+
+            ((MovieViewHolder) holder).cardView.setOnClickListener(v -> mListener.onClick(mMovieList.get(position)));
+
         }else{
             showLoadingView((LoadingViewHolder) holder, position);
         }
@@ -99,15 +108,17 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         addMovies(filterList);
     }
 
-    private static class MovieViewHolder  extends RecyclerView.ViewHolder{
+    private static class MovieViewHolder  extends RecyclerView.ViewHolder {
 
+        public CardView cardView;
         public ImageView ivMovie;
         public TextView tvTitle;
         public TextView tvDesc;
-
+        public IMovieClickListener mListener;
 
         public MovieViewHolder(final View itemView){
             super(itemView);
+            this.cardView = itemView.findViewById(R.id.cardView);
             this.ivMovie = itemView.findViewById(R.id.ivMovie);
             this.tvTitle = itemView.findViewById(R.id.tvTitle);
             this.tvDesc = itemView.findViewById(R.id.tvDesc);
