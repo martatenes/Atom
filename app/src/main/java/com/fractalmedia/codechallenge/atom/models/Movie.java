@@ -9,7 +9,8 @@ public class Movie implements Serializable {
 
     private long id;
     private String title;
-    private String description;
+    @SerializedName("overview")
+    private String overview;
     @SerializedName("poster_path")
     private String posterPath;
     @SerializedName("backdrop_path")
@@ -20,10 +21,10 @@ public class Movie implements Serializable {
     private long budget;
     private String status;
     @SerializedName("spoken_languages")
-    private List<Languages> spokenLanguagesList;
+    private List<SpokenLanguage> spokenLanguagesList;
     private boolean adult;
-    @SerializedName("belongs_to_collection")
-    private String belongsToCollection;
+  //  @SerializedName("belongs_to_collection")
+  //  private String belongsToCollection;
     private String homepage;
     @SerializedName("imdb_id")
     private String imdbId;
@@ -31,7 +32,6 @@ public class Movie implements Serializable {
     private String originalLanguage;
     @SerializedName("original_title")
     private String originalTitle;
-    private String overview;
     @SerializedName("production_companies")
     List<ProductionCompany> productionCompanies;
     @SerializedName("production_countries")
@@ -39,7 +39,7 @@ public class Movie implements Serializable {
     @SerializedName("release_date")
     private String releaseDate;
     private float revenue;
-    private float runtime;
+    private int runtime;
     private String tagline;
     private boolean video;
     @SerializedName("vote_average")
@@ -58,12 +58,13 @@ public class Movie implements Serializable {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
+
+    public String getOverview() {
+        return overview;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setOverview(String overview) {
+        this.overview = overview;
     }
 
     public String getPosterPath() {
@@ -114,11 +115,11 @@ public class Movie implements Serializable {
         this.status = status;
     }
 
-    public List<Languages> getSpokenLanguagesList() {
+    public List<SpokenLanguage> getSpokenLanguagesList() {
         return spokenLanguagesList;
     }
 
-    public void setSpokenLanguagesList(List<Languages> spokenLanguagesList) {
+    public void setSpokenLanguagesList(List<SpokenLanguage> spokenLanguagesList) {
         this.spokenLanguagesList = spokenLanguagesList;
     }
 
@@ -130,13 +131,13 @@ public class Movie implements Serializable {
         this.adult = adult;
     }
 
-    public String getBelongsToCollection() {
+  /*  public String getBelongsToCollection() {
         return belongsToCollection;
     }
 
     public void setBelongsToCollection(String belongsToCollection) {
         this.belongsToCollection = belongsToCollection;
-    }
+    }*/
 
     public String getHomepage() {
         return homepage;
@@ -211,11 +212,11 @@ public class Movie implements Serializable {
         this.revenue = revenue;
     }
 
-    public float getRuntime() {
+    public int getRuntime() {
         return runtime;
     }
 
-    public void setRuntime(float runtime) {
+    public void setRuntime(int runtime) {
         this.runtime = runtime;
     }
 

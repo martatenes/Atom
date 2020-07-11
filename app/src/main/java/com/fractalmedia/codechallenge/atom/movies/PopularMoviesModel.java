@@ -44,7 +44,8 @@ public class PopularMoviesModel implements PopularMoviesContract.Model {
     @Override
     public void getMoviesListByQuery(OnFinishedListener onFinishedListener, int numPage, String query) {
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-        Call<MovieListResponse> call = apiService.getMoviesBySearch(API_KEY, numPage, query);
+        String finalQuery = query.replace(" ", "%");
+        Call<MovieListResponse> call = apiService.getMoviesBySearch(API_KEY, numPage, finalQuery, true);
         call.enqueue(new Callback<MovieListResponse>() {
             @Override
             public void onResponse(Call<MovieListResponse> call, Response<MovieListResponse> response) {

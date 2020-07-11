@@ -32,15 +32,17 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         void onClick(Movie movie);
     }
     public List<Movie> mMovieList;
-    private Context context;
+    private Context mContext;
     private IMovieClickListener mListener;
     private final int VIEW_TYPE_ITEM = 0;
     private final int VIEW_TYPE_LOADING = 1;
+    private String baseUrl;
 
     public MovieAdapter(Context context, IMovieClickListener listener){
-        this.context = context;
+        this.mContext = context;
         this.mListener = listener;
-        mMovieList = new ArrayList<>();
+        this.mMovieList = new ArrayList<>();
+        this.baseUrl = Utils.getBaseUrlImages(context) + "w780"; //TODO: Sería mejor crear una clase para clasificar los tamaños de las imágenes
     }
 
     @Override
@@ -65,14 +67,11 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (holder instanceof MovieViewHolder) {
             MovieViewHolder movieHolder = (MovieViewHolder) holder;
             movieHolder.tvTitle.setText(mMovieList.get(position).getTitle());
-            movieHolder.tvDesc.setText(mMovieList.get(position).getDescription());
+            movieHolder.tvDesc.setText(mMovieList.get(position).getOverview());
 
-            SharedPreferences sharedPreferences = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
-            String baseUrl = Utils.getBaseUrlImages()
             String imagePath = mMovieList.get(position).getBackdropPath();
             if (baseUrl != null && imagePath != null) {
-                String url = baseUrl + "w780" + imagePath;
-                Picasso.get().load(url).placeholder(R.drawable.progress_animation).error(R.drawable.ic_movie_placeholder).into(movieHolder.ivMovie);
+                Picasso.get().load(baseUrl + imagePath).placeholder(R.drawable.progress_animation).error(R.drawable.ic_movie_placeholder).into(movieHolder.ivMovie);
             }
 
             ((MovieViewHolder) holder).cardView.setOnClickListener(v -> mListener.onClick(mMovieList.get(position)));
@@ -97,16 +96,6 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    public void filterItems(String query) {
-        List<Movie> filterList = new ArrayList<Movie>();
-        for(Movie movie : mMovieList){
-            if (movie.getTitle().toLowerCase().contains(query.toLowerCase())){
-                filterList.add(movie);
-            }
-        }
-        clearAll();
-        addMovies(filterList);
-    }
 
     private static class MovieViewHolder  extends RecyclerView.ViewHolder {
 
@@ -114,7 +103,6 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         public ImageView ivMovie;
         public TextView tvTitle;
         public TextView tvDesc;
-        public IMovieClickListener mListener;
 
         public MovieViewHolder(final View itemView){
             super(itemView);

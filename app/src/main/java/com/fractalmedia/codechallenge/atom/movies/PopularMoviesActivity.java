@@ -92,6 +92,12 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
         recyclerView.setAdapter(mAdapter);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPresenter.onDestroy();
+    }
+
     public void OnClickMovie(Movie movie){
         Log.d("Movie", movie.getTitle());
         Intent intent = new Intent(this, MovieDetailsActivity.class);
@@ -234,13 +240,8 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
     public void onResponseFailure(Throwable throwable) {
         swipeRefreshLayout.setRefreshing(false);
         isLoading = false;
-        Utils.ShowSimpleAlert(this, getString(R.string.TR_ERROR),  getString(R.string.TR_OCURRIO_ERROR_CONFIGURACION), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("HOLA", "HOLA");
-            }
-        });
-        Utils.ShowSimpleAlert(this, getString(R.string.TR_ERROR),  getString(R.string.TR_OCURRIO_ERROR_CONFIGURACION));
+
+        Utils.ShowSimpleAlert(this, getString(R.string.TR_ERROR),  getString(R.string.TR_OCURRIO_ERROR_OBTENER_INFO));
     }
 
 

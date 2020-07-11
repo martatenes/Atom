@@ -31,7 +31,6 @@ public class SplashModel implements SplashContract.Model {
 
             @Override
             public void onFailure(Call<ConfigurationResponse> call, Throwable t) {
-                // Log error here since request failed
                 Log.e(TAG, t.toString());
                 onFinishedListener.onFailure(t);
             }

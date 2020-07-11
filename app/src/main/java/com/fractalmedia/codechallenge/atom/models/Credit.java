@@ -1,9 +1,13 @@
 package com.fractalmedia.codechallenge.atom.models;
 
-public class Genre {
+import com.google.gson.annotations.SerializedName;
+
+public class Credit {
 
     private long id;
     private String name;
+    @SerializedName("profile_path")
+    private String profilePath;
 
     public long getId() {
         return id;
@@ -19,5 +23,13 @@ public class Genre {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getProfilePath() {
+        return profilePath;
+    }
+
+    public void setProfilePath(String profilePath) {
+        this.profilePath = profilePath;
     }
 }
