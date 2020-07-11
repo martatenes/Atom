@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".movie_details.MovieDetailsActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <RelativeLayout
+        android:id="@+id/rlMovie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <ImageView
+            android:id="@+id/ivMovie"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"/>
+
+<LinearLayout
+    android:id="@+id/lyTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/ivMovie"
+    android:padding="10dp"
+    android:orientation="horizontal">
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:gravity="start"
+        android:maxLines="2"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvRelease"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="50dp"
+        android:layout_weight="0.5"
+        android:gravity="end"
+        android:maxLines="1"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="50dp"
+        android:layout_weight="0.5"
+        android:gravity="end"
+        android:maxLines="1"
+        android:textStyle="bold" />
+
+</LinearLayout>
+
+
+
+
+        <co.lujun.androidtagview.TagContainerLayout
+            android:id="@+id/tagGenres"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/ivAdults"
+            android:layout_toLeftOf="@id/ivAdults"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_below="@id/lyTitle"
+            android:layout_margin="0dp"
+            android:padding="10dp"
+            app:container_enable_drag="false"
+            app:horizontal_interval="10dp"
+            app:vertical_interval="10dp"
+            app:tag_clickable="true"
+            app:tag_theme="pure_cyan" />
+
+        <ImageView
+            android:id="@+id/ivAdults"
+            android:layout_below="@id/lyTitle"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:layout_marginVertical="10dp"
+            android:src="@drawable/ic_adults"
+            android:layout_marginEnd="10dp" />
+
+
+    <TextView
+        android:id="@+id/tvOverview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_below="@id/ivAdults"
+        android:padding="10dp"
+        android:ellipsize="end" />
+
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCredits"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvOverview"/>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"/>
+    </RelativeLayout>
+
+
+    </ScrollView>
+    </RelativeLayout>
+
+
+
+

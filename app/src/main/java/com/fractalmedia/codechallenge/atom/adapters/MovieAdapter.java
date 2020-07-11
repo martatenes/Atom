@@ -13,11 +13,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fractalmedia.codechallenge.atom.R;
 import com.fractalmedia.codechallenge.atom.constants.Constants;
 import com.fractalmedia.codechallenge.atom.models.Movie;
+import com.fractalmedia.codechallenge.atom.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -26,15 +28,21 @@ import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
 
+    public interface IMovieClickListener{
+        void onClick(Movie movie);
+    }
     public List<Movie> mMovieList;
-    private Context context;
-
+    private Context mContext;
+    private IMovieClickListener mListener;
     private final int VIEW_TYPE_ITEM = 0;
     private final int VIEW_TYPE_LOADING = 1;
+    private String baseUrl;
 
-    public MovieAdapter(Context context){
-        this.context = context;
-        mMovieList = new ArrayList<>();
+    public MovieAdapter(Context context, IMovieClickListener listener){
+        this.mContext = context;
+        this.mListener = listener;
+        this.mMovieList = new ArrayList<>();
+        this.baseUrl = Utils.getBaseUrlImages(context) + "w780"; //TODO: Sería mejor crear una clase para clasificar los tamaños de las imágenes
     }
 
     @Override
@@ -59,15 +67,15 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (holder instanceof MovieViewHolder) {
             MovieViewHolder movieHolder = (MovieViewHolder) holder;
             movieHolder.tvTitle.setText(mMovieList.get(position).getTitle());
-            movieHolder.tvDesc.setText(mMovieList.get(position).getDescription());
+            movieHolder.tvDesc.setText(mMovieList.get(position).getOverview());
 
-            SharedPreferences sharedPreferences = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
-            String baseUrl = sharedPreferences.getString(Constants.CONFIGURATION_URL, null);
             String imagePath = mMovieList.get(position).getBackdropPath();
             if (baseUrl != null && imagePath != null) {
-                String url = baseUrl + "w780" + imagePath;
-                Picasso.get().load(url).placeholder(R.drawable.progress_animation).error(R.drawable.ic_movie_placeholder).into(movieHolder.ivMovie);
+                Picasso.get().load(baseUrl + imagePath).placeholder(R.drawable.progress_animation).error(R.drawable.ic_movie_placeholder).into(movieHolder.ivMovie);
             }
+
+            ((MovieViewHolder) holder).cardView.setOnClickListener(v -> mListener.onClick(mMovieList.get(position)));
+
         }else{
             showLoadingView((LoadingViewHolder) holder, position);
         }
@@ -88,26 +96,17 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    public void filterItems(String query) {
-        List<Movie> filterList = new ArrayList<Movie>();
-        for(Movie movie : mMovieList){
-            if (movie.getTitle().toLowerCase().contains(query.toLowerCase())){
-                filterList.add(movie);
-            }
-        }
-        clearAll();
-        addMovies(filterList);
-    }
 
-    private static class MovieViewHolder  extends RecyclerView.ViewHolder{
+    private static class MovieViewHolder  extends RecyclerView.ViewHolder {
 
+        public CardView cardView;
         public ImageView ivMovie;
         public TextView tvTitle;
         public TextView tvDesc;
 
-
         public MovieViewHolder(final View itemView){
             super(itemView);
+            this.cardView = itemView.findViewById(R.id.cardView);
             this.ivMovie = itemView.findViewById(R.id.ivMovie);
             this.tvTitle = itemView.findViewById(R.id.tvTitle);
             this.tvDesc = itemView.findViewById(R.id.tvDesc);

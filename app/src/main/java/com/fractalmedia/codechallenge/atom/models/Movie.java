@@ -2,14 +2,15 @@ package com.fractalmedia.codechallenge.atom.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
+public class Movie implements Serializable {
 
-public class Movie {
-
+    private long id;
     private String title;
     @SerializedName("overview")
-    private String description;
+    private String overview;
     @SerializedName("poster_path")
     private String posterPath;
     @SerializedName("backdrop_path")
@@ -20,16 +21,33 @@ public class Movie {
     private long budget;
     private String status;
     @SerializedName("spoken_languages")
-    private List<Languages> spokenLanguagesList;
+    private List<SpokenLanguage> spokenLanguagesList;
+    private boolean adult;
+  //  @SerializedName("belongs_to_collection")
+  //  private String belongsToCollection;
+    private String homepage;
+    @SerializedName("imdb_id")
+    private String imdbId;
+    @SerializedName("original_language")
+    private String originalLanguage;
+    @SerializedName("original_title")
+    private String originalTitle;
+    @SerializedName("production_companies")
+    List<ProductionCompany> productionCompanies;
+    @SerializedName("production_countries")
+    List<ProductionCountry> productionCountries;
+    @SerializedName("release_date")
+    private String releaseDate;
+    private float revenue;
+    private int runtime;
+    private String tagline;
+    private boolean video;
+    @SerializedName("vote_average")
+    private float voteAverage;
+    @SerializedName("vote_count")
+    private float voteCount;
 
-    public Movie(String title, String description, String posterPath, String backdropPath, float popularity, long budget, String status) {
-        this.title = title;
-        this.description = description;
-        this.posterPath = posterPath;
-        this.backdropPath = backdropPath;
-        this.popularity = popularity;
-        this.budget = budget;
-        this.status = status;
+    public Movie(){
     }
 
     public String getTitle() {
@@ -40,12 +58,13 @@ public class Movie {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
+
+    public String getOverview() {
+        return overview;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setOverview(String overview) {
+        this.overview = overview;
     }
 
     public String getPosterPath() {
@@ -96,11 +115,140 @@ public class Movie {
         this.status = status;
     }
 
-    public List<Languages> getSpokenLanguagesList() {
+    public List<SpokenLanguage> getSpokenLanguagesList() {
         return spokenLanguagesList;
     }
 
-    public void setSpokenLanguagesList(List<Languages> spokenLanguagesList) {
+    public void setSpokenLanguagesList(List<SpokenLanguage> spokenLanguagesList) {
         this.spokenLanguagesList = spokenLanguagesList;
+    }
+
+    public boolean isAdult() {
+        return adult;
+    }
+
+    public void setAdult(boolean adult) {
+        this.adult = adult;
+    }
+
+  /*  public String getBelongsToCollection() {
+        return belongsToCollection;
+    }
+
+    public void setBelongsToCollection(String belongsToCollection) {
+        this.belongsToCollection = belongsToCollection;
+    }*/
+
+    public String getHomepage() {
+        return homepage;
+    }
+
+    public void setHomepage(String homepage) {
+        this.homepage = homepage;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getImdbId() {
+        return imdbId;
+    }
+
+    public void setImdbId(String imdbId) {
+        this.imdbId = imdbId;
+    }
+
+    public String getOriginalLanguage() {
+        return originalLanguage;
+    }
+
+    public void setOriginalLanguage(String originalLanguage) {
+        this.originalLanguage = originalLanguage;
+    }
+
+    public String getOriginalTitle() {
+        return originalTitle;
+    }
+
+    public void setOriginalTitle(String originalTitle) {
+        this.originalTitle = originalTitle;
+    }
+
+
+    public List<ProductionCompany> getProductionCompanies() {
+        return productionCompanies;
+    }
+
+    public void setProductionCompanies(List<ProductionCompany> productionCompanies) {
+        this.productionCompanies = productionCompanies;
+    }
+
+    public List<ProductionCountry> getProductionCountries() {
+        return productionCountries;
+    }
+
+    public void setProductionCountries(List<ProductionCountry> productionCountries) {
+        this.productionCountries = productionCountries;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public float getRevenue() {
+        return revenue;
+    }
+
+    public void setRevenue(float revenue) {
+        this.revenue = revenue;
+    }
+
+    public int getRuntime() {
+        return runtime;
+    }
+
+    public void setRuntime(int runtime) {
+        this.runtime = runtime;
+    }
+
+    public String getTagline() {
+        return tagline;
+    }
+
+    public void setTagline(String tagline) {
+        this.tagline = tagline;
+    }
+
+    public boolean isVideo() {
+        return video;
+    }
+
+    public void setVideo(boolean video) {
+        this.video = video;
+    }
+
+    public float getVoteAverage() {
+        return voteAverage;
+    }
+
+    public void setVoteAverage(float voteAverage) {
+        this.voteAverage = voteAverage;
+    }
+
+    public float getVoteCount() {
+        return voteCount;
+    }
+
+    public void setVoteCount(float voteCount) {
+        this.voteCount = voteCount;
     }
 }

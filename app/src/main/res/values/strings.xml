@@ -8,4 +8,6 @@
     <string name="TR_NO_SE_HAN_ENCONTRADO_PELICULAS">Vaya, parece que no hemos encontrado películas. Inténtalo de nuevo.</string>
     <string name="TR_ERROR_COMUNICAR_SERVIDOR">Vaya, parece que ocurrió un error al comunicar con el servidor. Inténtelo de nuevo.</string>
     <string name="TR_ERROR">Error</string>
+    <string name="TR_ACEPTAR">Aceptar</string>
+    <string name="TR_OCURRIO_ERROR_OBTENER_INFO">Vaya, parece que ocurrió un error al obtener la información. Por favor, vuélvelo a intentar.</string>
 </resources>
