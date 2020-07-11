@@ -1,5 +1,6 @@
 package com.fractalmedia.codechallenge.atom.movie_details;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -60,7 +62,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements MovieDeta
     @Override
     protected void onStart() {
         super.onStart();
-        mPresenter = new MovieDetailsPresenter(this);
+        if (mPresenter == null) mPresenter = new MovieDetailsPresenter(this);
         if (movie != null) {
             mPresenter.requestMovie(movie.getId());
             mPresenter.requestCredits(movie.getId());
@@ -70,7 +72,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements MovieDeta
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mPresenter.onDestroy();
+        if (mPresenter != null)
+            mPresenter.onDestroy();
     }
 
     private void initUI(){
@@ -98,7 +101,17 @@ public class MovieDetailsActivity extends AppCompatActivity implements MovieDeta
             actionBar.setTitle(movie.getTitle());
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
+
+
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -58,14 +58,24 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
         initUI();
         setUpListeners();
 
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        // Inicializamos presenter
-        mPresenter = new PopularMoviesPresenter(this);
-        mPresenter.requestMovies(1);
+        if (mPresenter == null) {
+            mPresenter = new PopularMoviesPresenter(this);
+            mPresenter.requestMovies(1);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mPresenter != null) {
+            mPresenter.onDestroy();
+        }
     }
 
     @Override
@@ -92,11 +102,6 @@ public class PopularMoviesActivity extends AppCompatActivity implements PopularM
         recyclerView.setAdapter(mAdapter);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mPresenter.onDestroy();
-    }
 
     public void OnClickMovie(Movie movie){
         Log.d("Movie", movie.getTitle());
